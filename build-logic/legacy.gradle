@@ -1,0 +1,87 @@
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+def props = new Properties()
+file('../../version.properties').withInputStream { props.load(it) }
+version=props.version
+group='cn.mcmod.corn_delight'
+base.archivesName='corn_delight'
+sourceSets.main.resources.srcDir '../../common/src/main/resources'
+def generatedJava=layout.buildDirectory.dir('generated/version/java')
+sourceSets.main.java.srcDir generatedJava
+tasks.register('generateVersion') {
+ inputs.property('modVersion',project.version);outputs.dir generatedJava
+ doLast {
+  def out=new File(generatedJava.get().asFile,'cn/mcmod/corn_delight/legacy/BuildVersion.java');out.parentFile.mkdirs()
+  out.text="package cn.mcmod.corn_delight.legacy; public final class BuildVersion { public static final String VERSION = \"${project.version}\"; private BuildVersion() {} }\n"
+ }
+}
+compileJava.dependsOn 'generateVersion' 
+def fd=file('../../../FarmersDelight-Legacy')
+def fdProps=new Properties(); new File(fd,'version.properties').withInputStream { fdProps.load(it) }
+dependencies { compileOnly files(new File(fd,"versions/${minecraftTarget}/build/devlibs/farmersdelight-${fdProps.version}+mc${minecraftTarget}-dev.jar")) }
+tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8' }
+processResources {
+ inputs.dir file('../../src/main/resources')
+ filesMatching('mcmod.info') { expand(modVersion:project.version,minecraftTarget:minecraftTarget) }
+ doLast {
+  def source=file('../../src/main/resources')
+  def dest=destinationDir
+  def writeJson={ String path,Object value -> def out=new File(dest,path); out.parentFile.mkdirs(); out.setText(JsonOutput.toJson(value),'UTF-8') }
+  def recipes=[:],tags=[:]
+  fileTree(new File(source,'data/corn_delight/recipes')).matching { include '**/*.json' }.files.sort().each { f ->
+   def id='corn_delight:'+new File(source,'data/corn_delight/recipes').toPath().relativize(f.toPath()).toString().replace('\\','/').replaceAll(/\.json$/,'')
+   recipes[id]=new JsonSlurper().parse(f)
+  }
+  fileTree(new File(source,'data')).matching { include '*/tags/items/**/*.json' }.files.sort().each { f ->
+   def path=new File(source,'data').toPath().relativize(f.toPath()).toString().replace('\\','/').split('/tags/items/')
+   tags[path[0]+':'+path[1].replaceAll(/\.json$/,'')]=new JsonSlurper().parse(f)
+  }
+  writeJson('corn_delight/source_recipes.json',recipes); writeJson('corn_delight/source_tags.json',tags)
+  copy { from new File(source,'assets/corn_delight/textures/item'); into new File(dest,'assets/corn_delight/textures/items') }
+  copy { from new File(source,'assets/corn_delight/textures/block'); into new File(dest,'assets/corn_delight/textures/blocks') }
+  def lang=new File(dest,"assets/corn_delight/lang/${minecraftTarget=='1.12.2'?'en_us':'en_US'}.lang");lang.parentFile.mkdirs();if(lang.exists()) lang.delete()
+  def language=new JsonSlurper().parse(new File(source,'assets/corn_delight/lang/en_us.json'))
+  lang.setText(language.collect { k,v -> (k.startsWith('block.') ? k.replaceFirst('block.','tile.') : k)+'.name='+v }.join('\n')+'\n','UTF-8')
+  if(minecraftTarget=='1.12.2') {
+   ['models','blockstates'].each { dir ->
+    fileTree(new File(source,'assets/corn_delight/'+dir)).matching { include '**/*.json' }.files.each { f ->
+     def rel=new File(source,'assets/corn_delight').toPath().relativize(f.toPath()).toString()
+     def output=new File(dest,'assets/corn_delight/'+rel); output.parentFile.mkdirs()
+     output.setText(f.getText('UTF-8').replace('corn_delight:block/','corn_delight:blocks/').replace('corn_delight:item/','corn_delight:items/').replace('farmersdelight:block/','farmersdelight:blocks/').replace('minecraft:block/','block/').replace('minecraft:item/','item/'),'UTF-8')
+     // Models refer to models/, while only texture paths use textures/blocks and textures/items.
+     def parsed=new JsonSlurper().parse(output)
+     if(parsed.parent?.startsWith('corn_delight:blocks/')) parsed.parent=parsed.parent.replace(':blocks/',':block/')
+     if(parsed.parent?.startsWith('corn_delight:items/')) parsed.parent=parsed.parent.replace(':items/',':item/')
+     if(parsed.variants) parsed.variants.values().each { variant -> variant.model=variant.model.replace('corn_delight:blocks/','corn_delight:') }
+     output.setText(JsonOutput.toJson(parsed),'UTF-8')
+    }
+   }
+  }
+ }
+}
+jar {
+ from('../../LICENSE') { into 'META-INF'; rename { 'LICENSE-CornDelight.txt' } }
+ manifest { attributes 'Implementation-Title':'Corn Delight Legacy','Implementation-Version':project.version }
+ preserveFileTimestamps=false; reproducibleFileOrder=true
+ archiveFileName="corn_delight-${project.version}+mc${minecraftTarget}-dev.jar"
+ destinationDirectory=layout.buildDirectory.dir('devlibs')
+}
+tasks.matching { it.name in ['remapJar','reobfJar'] }.configureEach {
+ archiveFileName="corn_delight-${project.version}+mc${minecraftTarget}.jar"
+ destinationDirectory=layout.buildDirectory.dir('libs')
+}
+def production=providers.provider { tasks.named(minecraftTarget=='1.7.10' ? 'reobfJar' : 'remapJar').get() }
+tasks.register('release',Sync) {
+ dependsOn production
+ from production.flatMap { it.archiveFile }
+ into layout.buildDirectory.dir('release')
+ doFirst {
+  def jar=production.get().archiveFile.get().asFile
+  def zip=new java.util.zip.ZipFile(jar)
+  try {
+   ['mcmod.info','corn_delight/foods.json','corn_delight/source_recipes.json','corn_delight/source_tags.json','cn/mcmod/corn_delight/legacy/CornDelight.class','cn/mcmod/corn_delight/legacy/CornCrop.class','assets/corn_delight/textures/items/corn.png'].each { if(!zip.getEntry(it)) throw new GradleException("Missing distribution entry: ${it}") }
+   zip.entries().each { e -> if(e.name.startsWith('vectorwing/') || e.name.startsWith('net/minecraft/') || e.name.endsWith('.java')) throw new GradleException("Bundled dependency/source: ${e.name}") }
+  } finally { zip.close() }
+ }
+}
+tasks.named('build') { dependsOn 'release' }

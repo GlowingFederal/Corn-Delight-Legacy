@@ -1,0 +1,12 @@
+plugins { id 'java'; id 'xyz.wagyourtail.unimined' version '1.4.1' }
+ext.minecraftTarget = '1.12.2'
+apply from: '../../build-logic/legacy.gradle'
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+tasks.withType(JavaCompile).configureEach { options.release = 8 }
+unimined.minecraft {
+ version '1.12.2'
+ mappings { mcp('stable', '39-1.12') }
+ minecraftForge { loader '14.23.5.2859' }
+}
+
+jar.finalizedBy 'remapJar'

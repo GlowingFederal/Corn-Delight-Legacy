@@ -1,0 +1,16 @@
+[
+  {
+    "modid": "corn_delight",
+    "name": "Corn Delight Legacy",
+    "description": "Corn farming and cooking for Farmer's Delight Legacy.",
+    "version": "${modVersion}",
+    "mcversion": "${minecraftTarget}",
+    "authorList": [
+      "MCMOD Modding Group",
+      "Zheng Syameimaru"
+    ],
+    "dependencies": [
+      "farmersdelight"
+    ]
+  }
+]

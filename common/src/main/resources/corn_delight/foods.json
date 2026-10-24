@@ -1,0 +1,118 @@
+[
+  {
+    "id": "corn",
+    "nutrition": 2,
+    "saturation": 0.2
+  },
+  {
+    "id": "corn_seeds",
+    "nutrition": 1,
+    "saturation": 0.2
+  },
+  {
+    "id": "grilled_corn",
+    "nutrition": 6,
+    "saturation": 0.2
+  },
+  {
+    "id": "boiled_corn",
+    "nutrition": 6,
+    "saturation": 0.2
+  },
+  {
+    "id": "popcorn",
+    "nutrition": 3,
+    "saturation": 0.5
+  },
+  {
+    "id": "creamed_corn",
+    "nutrition": 7,
+    "saturation": 0.5,
+    "effects": [
+      {
+        "effect": "comfort",
+        "duration": 3600
+      }
+    ],
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "id": "corn_soup",
+    "nutrition": 10,
+    "saturation": 0.9,
+    "effects": [
+      {
+        "effect": "comfort",
+        "duration": 3600
+      }
+    ],
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "id": "creamy_corn_drink",
+    "nutrition": 2,
+    "saturation": 0.6,
+    "effects": [
+      {
+        "effect": "comfort",
+        "duration": 3600
+      },
+      {
+        "effect": "regeneration",
+        "duration": 3600
+      }
+    ],
+    "container": "minecraft:glass_bottle",
+    "stackSize": 16
+  },
+  {
+    "id": "cornbread_batter",
+    "nutrition": 1,
+    "saturation": 0.2
+  },
+  {
+    "id": "cornbread",
+    "nutrition": 4,
+    "saturation": 0.5
+  },
+  {
+    "id": "tortilla_raw",
+    "nutrition": 1,
+    "saturation": 0.2
+  },
+  {
+    "id": "tortilla",
+    "nutrition": 3,
+    "saturation": 0.4
+  },
+  {
+    "id": "taco",
+    "nutrition": 12,
+    "saturation": 0.8,
+    "effects": [
+      {
+        "effect": "strength",
+        "duration": 600
+      }
+    ]
+  },
+  {
+    "id": "cornbread_stuffing",
+    "nutrition": 18,
+    "saturation": 1.0,
+    "effects": [
+      {
+        "effect": "comfort",
+        "duration": 3600
+      },
+      {
+        "effect": "nourishment",
+        "duration": 6000
+      }
+    ],
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  }
+]
