@@ -1,0 +1,149 @@
+{
+  "forge:cooked_beef": {
+    "replace": false,
+    "values": [
+      "minecraft:cooked_beef",
+      "farmersdelight:beef_patty"
+    ]
+  },
+  "forge:cooked_chicken": {
+    "replace": false,
+    "values": [
+      "minecraft:cooked_chicken",
+      "farmersdelight:cooked_chicken_cuts"
+    ]
+  },
+  "forge:cooked_mutton": {
+    "replace": false,
+    "values": [
+      "minecraft:cooked_mutton",
+      "farmersdelight:cooked_mutton_chops"
+    ]
+  },
+  "forge:cooked_pork": {
+    "replace": false,
+    "values": [
+      "minecraft:cooked_porkchop",
+      "farmersdelight:cooked_bacon"
+    ]
+  },
+  "forge:crops/onion": {
+    "replace": false,
+    "values": [
+      "farmersdelight:onion"
+    ]
+  },
+  "forge:eggs": {
+    "values": [
+      "minecraft:egg"
+    ]
+  },
+  "forge:milk": {
+    "replace": false,
+    "values": [
+      "#forge:milk/milk",
+      "#forge:milk/milk_bottle"
+    ]
+  },
+  "forge:milk/milk": {
+    "replace": false,
+    "values": [
+      "minecraft:milk_bucket"
+    ]
+  },
+  "forge:milk/milk_bottle": {
+    "replace": false,
+    "values": [
+      "farmersdelight:milk_bottle"
+    ]
+  },
+  "forge:raw_beef": {
+    "replace": false,
+    "values": [
+      "minecraft:beef",
+      "farmersdelight:minced_beef"
+    ]
+  },
+  "forge:raw_chicken": {
+    "replace": false,
+    "values": [
+      "minecraft:chicken",
+      "farmersdelight:chicken_cuts"
+    ]
+  },
+  "forge:raw_pork": {
+    "replace": false,
+    "values": [
+      "minecraft:porkchop",
+      "farmersdelight:bacon"
+    ]
+  },
+  "forge:salad_ingredients": {
+    "replace": false,
+    "values": [
+      "#forge:salad_ingredients/cabbage"
+    ]
+  },
+  "forge:salad_ingredients/cabbage": {
+    "replace": false,
+    "values": [
+      "farmersdelight:cabbage",
+      "farmersdelight:cabbage_leaf"
+    ]
+  },
+  "forge:tools/knives": {
+    "replace": false,
+    "values": [
+      "farmersdelight:flint_knife",
+      "farmersdelight:iron_knife",
+      "farmersdelight:diamond_knife",
+      "farmersdelight:golden_knife",
+      "farmersdelight:netherite_knife"
+    ]
+  },
+  "forge:vegetables": {
+    "replace": false,
+    "values": [
+      "#forge:vegetables/beetroot",
+      "#forge:vegetables/carrot",
+      "#forge:vegetables/onion",
+      "#forge:vegetables/potato",
+      "#forge:vegetables/tomato"
+    ]
+  },
+  "forge:vegetables/beetroot": {
+    "replace": false,
+    "values": [
+      "minecraft:beetroot"
+    ]
+  },
+  "forge:vegetables/carrot": {
+    "replace": false,
+    "values": [
+      "minecraft:carrot"
+    ]
+  },
+  "forge:vegetables/onion": {
+    "replace": false,
+    "values": [
+      "farmersdelight:onion"
+    ]
+  },
+  "forge:vegetables/potato": {
+    "replace": false,
+    "values": [
+      "minecraft:potato"
+    ]
+  },
+  "forge:vegetables/tomato": {
+    "replace": false,
+    "values": [
+      "farmersdelight:tomato"
+    ]
+  },
+  "forge:dough": {
+    "values": [
+      "farmersdelight:wheat_dough"
+    ]
+  }
+}

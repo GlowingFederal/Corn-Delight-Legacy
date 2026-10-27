@@ -18,7 +18,7 @@ public final class CornCrop extends BlockCrops {
  public int getMetaFromState(IBlockState state) { return getAge(state)|(state.getValue(UPPER)?8:0); }
  protected Item getSeed() { return CornDelight.ITEMS.get("corn_seeds"); }
  protected Item getCrop() { return CornDelight.ITEMS.get("corn"); }
- protected boolean canSustainBush(IBlockState state) { return state.getBlock()==net.minecraft.init.Blocks.FARMLAND || state.getBlock()==vectorwing.farmersdelight.legacy.Content.richFarmland; }
+ protected boolean canSustainBush(IBlockState state) { return state.getBlock()==net.minecraft.init.Blocks.FARMLAND || state.getBlock()==cn.mcmod.corn_delight.legacy.compat.Delight.integration.richFarmland(); }
  public boolean canBlockStay(World world,BlockPos pos,IBlockState state) {
   if(state.getValue(UPPER)) { IBlockState lower=world.getBlockState(pos.down());return lower.getBlock()==this && !lower.getValue(UPPER) && getAge(lower)>=4; }
   return super.canBlockStay(world,pos,state);

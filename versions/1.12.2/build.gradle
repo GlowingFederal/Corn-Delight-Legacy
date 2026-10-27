@@ -3,10 +3,19 @@ ext.minecraftTarget = '1.12.2'
 apply from: '../../build-logic/legacy.gradle'
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 tasks.withType(JavaCompile).configureEach { options.release = 8 }
+configurations { alternativeDelight }
+configurations.compileOnly.extendsFrom(configurations.alternativeDelight)
+
 unimined.minecraft {
  version '1.12.2'
  mappings { mcp('stable', '39-1.12') }
  minecraftForge { loader '14.23.5.2859' }
+ mods { remap(configurations.alternativeDelight) }
 }
 
 jar.finalizedBy 'remapJar'
+
+repositories { maven { url 'https://cursemaven.com'; content { includeGroup 'curse.maven' } } }
+dependencies {
+ alternativeDelight('curse.maven:farmers-delight-legacy-1517486:8884540') { transitive=false }
+}

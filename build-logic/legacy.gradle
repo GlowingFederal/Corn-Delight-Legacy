@@ -21,6 +21,7 @@ def fdProps=new Properties(); new File(fd,'version.properties').withInputStream 
 dependencies { compileOnly files(new File(fd,"versions/${minecraftTarget}/build/devlibs/farmersdelight-${fdProps.version}+mc${minecraftTarget}-dev.jar")) }
 tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8' }
 processResources {
+ inputs.property('modVersion',project.version); inputs.property('minecraftTarget',minecraftTarget)
  inputs.dir file('../../src/main/resources')
  filesMatching('mcmod.info') { expand(modVersion:project.version,minecraftTarget:minecraftTarget) }
  doLast {
@@ -47,11 +48,12 @@ processResources {
     fileTree(new File(source,'assets/corn_delight/'+dir)).matching { include '**/*.json' }.files.each { f ->
      def rel=new File(source,'assets/corn_delight').toPath().relativize(f.toPath()).toString()
      def output=new File(dest,'assets/corn_delight/'+rel); output.parentFile.mkdirs()
-     output.setText(f.getText('UTF-8').replace('corn_delight:block/','corn_delight:blocks/').replace('corn_delight:item/','corn_delight:items/').replace('farmersdelight:block/','farmersdelight:blocks/').replace('minecraft:block/','block/').replace('minecraft:item/','item/'),'UTF-8')
+     output.setText(f.getText('UTF-8').replace('corn_delight:block/','corn_delight:blocks/').replace('corn_delight:item/','corn_delight:items/').replace('farmersdelight:block/','corn_delight:blocks/').replace('minecraft:block/','block/').replace('minecraft:item/','item/'),'UTF-8')
      // Models refer to models/, while only texture paths use textures/blocks and textures/items.
      def parsed=new JsonSlurper().parse(output)
      if(parsed.parent?.startsWith('corn_delight:blocks/')) parsed.parent=parsed.parent.replace(':blocks/',':block/')
      if(parsed.parent?.startsWith('corn_delight:items/')) parsed.parent=parsed.parent.replace(':items/',':item/')
+     if(parsed.variants?.containsKey('')) { parsed.variants.normal=parsed.variants.remove('') }
      if(parsed.variants) parsed.variants.values().each { variant -> variant.model=variant.model.replace('corn_delight:blocks/','corn_delight:') }
      output.setText(JsonOutput.toJson(parsed),'UTF-8')
     }
