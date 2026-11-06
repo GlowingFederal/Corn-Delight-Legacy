@@ -23,3 +23,7 @@
 
 - Update addon metadata and release distributions to 1.0.1 for Forge 1.7.10 and 1.12.2.
 - Track version inputs when generating resources so internal mod metadata stays aligned with the release filename.
+
+2026-11-02 01:08 — Document shared UAB recipe and scripting support
+
+- Document optional MineTweaker 3 / CraftTweaker 2 methods for this addon’s existing cooking, cutting and grilling recipes, supplied by the updated Classic Edition core. Explain effective UAB feature gates and retain the alternative 1.12.2 integration.
