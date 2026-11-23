@@ -27,3 +27,7 @@
 2026-11-02 01:08 — Document shared UAB recipe and scripting support
 
 - Document optional MineTweaker 3 / CraftTweaker 2 methods for this addon’s existing cooking, cutting and grilling recipes, supplied by the updated Classic Edition core. Explain effective UAB feature gates and retain the alternative 1.12.2 integration.
+
+2026-11-12 14:05 — Increment patch version for release packaging
+
+- Advance the mod patch version by 0.0.1 and refresh matching native artifact and mod metadata versions.

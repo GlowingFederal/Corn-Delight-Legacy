@@ -40,9 +40,37 @@ processResources {
   writeJson('corn_delight/source_recipes.json',recipes); writeJson('corn_delight/source_tags.json',tags)
   copy { from new File(source,'assets/corn_delight/textures/item'); into new File(dest,'assets/corn_delight/textures/items') }
   copy { from new File(source,'assets/corn_delight/textures/block'); into new File(dest,'assets/corn_delight/textures/blocks') }
-  def lang=new File(dest,"assets/corn_delight/lang/${minecraftTarget=='1.12.2'?'en_us':'en_US'}.lang");lang.parentFile.mkdirs();if(lang.exists()) lang.delete()
-  def language=new JsonSlurper().parse(new File(source,'assets/corn_delight/lang/en_us.json'))
-  lang.setText(language.collect { k,v -> (k.startsWith('block.') ? k.replaceFirst('block.','tile.') : k)+'.name='+v }.join('\n')+'\n','UTF-8')
+  def languages = [:]
+  [source].each { resourceRoot ->
+   fileTree(new File(resourceRoot, 'assets/corn_delight/lang')).matching { include '*.json' }.files.sort().each { languageFile ->
+    String locale = languageFile.name[0..-6].toLowerCase(Locale.ROOT)
+    if (!(locale ==~ /[a-z]{2}_[a-z]{2}/)) throw new GradleException("Invalid locale: ${languageFile}")
+    if (!languages.containsKey(locale)) languages[locale] = [:]
+    languages[locale].putAll(new JsonSlurper().parse(languageFile, 'UTF-8'))
+   }
+  }
+  def english = languages.en_us
+  def catalog = new JsonSlurper().parse(file('../../common/src/main/resources/corn_delight/foods.json'), 'UTF-8')
+  def expected = catalog.collect { entry -> (entry.kind == 'block' ? 'block.' : 'item.') + 'corn_delight.' + entry.id }
+  expected.addAll(['corn_crop', 'corn_crate', 'corn_kernel_bag', 'wild_corn'].collect { 'block.corn_delight.' + it })
+  def missing = expected.findAll { !english?.get(it)?.trim() }
+  if (missing) throw new GradleException("Missing English display names: ${missing.join(', ')}")
+
+  languages.each { locale, translations ->
+   String nativeLocale = minecraftTarget == '1.12.2' ? locale : locale[0..2] + locale[3..4].toUpperCase(Locale.ROOT)
+   def legacy = [:]
+   translations.each { key, value ->
+    String nativeKey = key.startsWith('block.') ? 'tile.' + key.substring(6) : key
+    if (nativeKey.startsWith('tile.') || nativeKey.startsWith('item.')) {
+     nativeKey = nativeKey.replaceFirst(/(?:\.name)+$/, '') + '.name'
+    }
+    if (legacy.containsKey(nativeKey)) throw new GradleException("Duplicate ${locale} translation: ${nativeKey}")
+    legacy[nativeKey] = value
+   }
+   def languageFile = new File(dest, "assets/corn_delight/lang/${nativeLocale}.lang")
+   languageFile.parentFile.mkdirs()
+   languageFile.setText(legacy.collect { key, value -> "${key}=${value}" }.join('\n') + '\n', 'UTF-8')
+  }
   if(minecraftTarget=='1.12.2') {
    ['models','blockstates'].each { dir ->
     fileTree(new File(source,'assets/corn_delight/'+dir)).matching { include '**/*.json' }.files.each { f ->
@@ -83,6 +111,20 @@ tasks.register('release',Sync) {
   try {
    ['mcmod.info','corn_delight/foods.json','corn_delight/source_recipes.json','corn_delight/source_tags.json','cn/mcmod/corn_delight/legacy/CornDelight.class','cn/mcmod/corn_delight/legacy/CornCrop.class','assets/corn_delight/textures/items/corn.png'].each { if(!zip.getEntry(it)) throw new GradleException("Missing distribution entry: ${it}") }
    zip.entries().each { e -> if(e.name.startsWith('vectorwing/') || e.name.startsWith('net/minecraft/') || e.name.endsWith('.java')) throw new GradleException("Bundled dependency/source: ${e.name}") }
+   // Inspect the production archive after Forge reobfuscation/remapping.
+   def languageDir = new File(processResources.destinationDir, 'assets/corn_delight/lang')
+   def expectedLanguages = fileTree(languageDir).matching { include '*.lang' }.files
+   def archiveLanguages = zip.entries().findAll { !it.directory && it.name.startsWith('assets/corn_delight/lang/') }
+   if (!expectedLanguages || archiveLanguages.size() != expectedLanguages.size()) {
+    throw new GradleException("Incorrect packaged corn_delight locale count: ${archiveLanguages*.name}")
+   }
+   expectedLanguages.each { languageFile ->
+    def entry = zip.getEntry("assets/corn_delight/lang/${languageFile.name}")
+    def packaged = entry ? zip.getInputStream(entry).withCloseable { it.getText('UTF-8') } : null
+    if (packaged != languageFile.getText('UTF-8')) {
+     throw new GradleException("Missing or altered distribution locale: ${languageFile.name}")
+    }
+   }
   } finally { zip.close() }
  }
 }
