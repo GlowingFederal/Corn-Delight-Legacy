@@ -31,3 +31,7 @@
 2026-11-12 14:05 — Increment patch version for release packaging
 
 - Advance the mod patch version by 0.0.1 and refresh matching native artifact and mod metadata versions.
+
+2026-11-24 23:41 — Restore 1.12.2 display names
+
+- Declare resource-pack format 3 so Forge loads the generated lowercase language files and their English fallback.
